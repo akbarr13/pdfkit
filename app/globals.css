@@ -104,10 +104,74 @@ a { color: inherit; text-decoration: none; }
 .nav-link-item.active::after,
 .nav-link-item:hover::after { right: 0; }
 
-/* ─── Responsive ─── */
+/* ─── Responsive grid ─── */
 .tool-card { flex-direction: column; padding: 20px; gap: 12px; }
 
+.grid-4col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+/* ─── Mobile nav ─── */
+.nav-desktop { display: flex; align-items: stretch; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.nav-desktop::-webkit-scrollbar { display: none; }
+
+.nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text);
+  padding: 0 9px;
+  height: 30px;
+  margin: auto 0;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
+}
+.nav-hamburger:hover { border-color: var(--border-2); }
+
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+}
+
+@keyframes slideDown  { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes symbolPop  { 0% { opacity:0; transform:scale(0.6) } 50% { opacity:1; transform:scale(1.08) } 100% { opacity:1; transform:scale(1) } }
+@keyframes loaderRing { 0%,100% { transform:scale(1);   opacity:0.04 } 50% { transform:scale(1.6); opacity:0.09 } }
+
+.nav-mobile-menu {
+  position: fixed;
+  top: 48px;
+  left: 0;
+  right: 0;
+  z-index: 49;
+  background: rgba(249,248,244,0.97);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  animation: slideDown 0.18s ease both;
+}
+
+.nav-mobile-link {
+  display: block;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+  transition: color 0.12s, background 0.12s;
+}
+.nav-mobile-link:last-child { border-bottom: none; }
+.nav-mobile-link:hover { color: var(--text); background: var(--surface-2); }
+.nav-mobile-link.active { color: var(--accent); font-weight: 600; }
+
 @media (max-width: 600px) {
-  .nav-links { display: none; }
   .tool-card { padding: 16px; }
+  .nav-desktop { display: none; }
+  .nav-hamburger { display: flex; margin-left: auto; }
+  .grid-4col { grid-template-columns: repeat(2, 1fr); }
 }

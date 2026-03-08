@@ -17,6 +17,7 @@ A fast, privacy-first PDF toolkit that runs entirely in your browser. No uploads
 | **Split PDF** | Extract pages or define custom ranges into separate files |
 | **PDF → Image** | Render each page as JPEG or PNG at 72–216 dpi |
 | **Image → PDF** | Pack JPG/PNG files into a single PDF. Drag to set page order |
+| **Protect PDF** | Lock a PDF with a password. Encrypted output works in any PDF reader |
 
 ## Privacy
 
@@ -28,6 +29,7 @@ All processing happens locally in the browser using WebAssembly and Canvas APIs.
 - **[pdf-lib](https://pdf-lib.js.org/)** — PDF creation, merging, splitting
 - **[pdfjs-dist](https://mozilla.github.io/pdf.js/)** — PDF rendering to canvas
 - **[browser-image-compression](https://github.com/Donaldcwl/browser-image-compression)** — JPEG compression for compress tool
+- **[jsPDF](https://github.com/parallax/jsPDF)** — PDF creation with password encryption for protect tool
 - **[file-saver](https://github.com/eligrey/FileSaver.js/)** — Client-side file downloads
 
 ## Getting Started
@@ -73,9 +75,11 @@ app/
 ├── merge/page.tsx
 ├── split/page.tsx
 ├── pdf-to-image/page.tsx
-└── image-to-pdf/page.tsx
+├── image-to-pdf/page.tsx
+└── protect/page.tsx
 components/
-├── Navbar/
+├── Navbar/               # Responsive navbar with mobile hamburger menu
+├── AppLoader/            # Preloads all PDF libraries before site renders
 ├── DropZone/             # Drag-and-drop file input
 ├── FileList/             # File list with drag-to-reorder
 ├── ProgressBar/
@@ -88,6 +92,7 @@ lib/
 ├── compressPdf.ts
 ├── pdfToImage.ts
 ├── imageToPdf.ts
+├── protectPdf.ts
 └── useHotkey.ts          # Cmd/Ctrl+Enter shortcut
 ```
 

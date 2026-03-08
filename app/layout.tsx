@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import TopLoader from '@/components/TopLoader'
+import AppLoader from '@/components/AppLoader'
 
 export const metadata: Metadata = {
   title: 'pdfkit — free browser-side PDF tools',
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <TopLoader />
-        {children}
+        <AppLoader>
+          {children}
+        </AppLoader>
       </body>
     </html>
   )

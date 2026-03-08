@@ -90,7 +90,7 @@ export default function PdfToImagePage() {
 
             <div>
               <p style={{fontSize:12,color:'var(--text-2)',marginBottom:8,fontWeight:500}}>Resolution</p>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
+              <div className="grid-4col">
                 {scales.map(s=>(
                   <button key={s.value} onClick={()=>setScale(s.value)} style={scaleBtnStyle(scale===s.value)}>
                     <p className="mono" style={{fontSize:12,fontWeight:600,color:scale===s.value?'var(--accent)':'var(--text)',marginBottom:2}}>{s.label}</p>

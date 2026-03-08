@@ -84,7 +84,7 @@ export default function CompressPage() {
         {file && (
           <div>
             <p style={{fontSize:12,color:'var(--text-2)',marginBottom:8,fontWeight:500}}>Quality preset</p>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
+            <div className="grid-4col">
               {presets.map(p=>(
                 <button key={p.id} onClick={()=>setPreset(p.id)} style={presetBtnStyle(preset===p.id)}>
                   <p style={{fontSize:13,fontWeight:700,color:preset===p.id?'var(--accent)':'var(--text)',marginBottom:2}}>{p.label}</p>

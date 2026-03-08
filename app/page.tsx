@@ -10,6 +10,7 @@ const tools = [
   { href: '/split',        code: '03', label: 'Split PDF',    desc: 'Extract individual pages or define custom ranges into separate files.', symbol: '⊗' },
   { href: '/pdf-to-image', code: '04', label: 'PDF → Image',  desc: 'Render each PDF page as a JPEG or PNG image at any resolution.', symbol: '◫' },
   { href: '/image-to-pdf', code: '05', label: 'Image → PDF',  desc: 'Pack JPG and PNG files into a single PDF. Drag to set page order.', symbol: '◨' },
+  { href: '/protect',      code: '06', label: 'Protect PDF',  desc: 'Lock a PDF with a password. Encrypted output works in any PDF reader.', symbol: '⊛' },
 ]
 
 function ToolCard({ tool, index }: { tool: typeof tools[0]; index: number }) {
@@ -79,10 +80,10 @@ export default function HomePage() {
             lineHeight: 1.15, letterSpacing: '-0.025em',
             color: 'var(--text)', marginBottom: 10,
           }}>
-            PDF tools that <span style={{ color: 'var(--accent)' }}>work.</span>
+            iLovePDF loves your data. <span style={{ color: 'var(--accent)' }}>We don&apos;t.</span>
           </h1>
           <p className="anim-fade-up delay-2" style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.65 }}>
-            Merge, split, compress, and convert — all inside your browser. No uploads, no accounts.
+            Everything runs in your browser. Your PDFs never leave your device.
           </p>
         </div>
 
