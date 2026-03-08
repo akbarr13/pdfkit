@@ -23,7 +23,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--page);
   color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -35,7 +35,7 @@ a { color: inherit; text-decoration: none; }
 ::-webkit-scrollbar-track { background: var(--page); }
 ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
 
-.mono { font-family: 'Roboto Mono', 'SF Mono', monospace; }
+.mono { font-family: var(--font-roboto-mono), 'SF Mono', monospace; }
 
 /* ─── Animations ─── */
 @keyframes fadeUp   { from { opacity:0; transform:translateY(18px) } to { opacity:1; transform:translateY(0) } }

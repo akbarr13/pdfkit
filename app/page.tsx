@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 
 const tools = [
@@ -64,6 +64,12 @@ function ToolCard({ tool, index }: { tool: typeof tools[0]; index: number }) {
 }
 
 export default function HomePage() {
+  useEffect(() => {
+    // Prefetch heavy libs used by compress + image tools
+    import('pdfjs-dist')
+    import('pdf-lib')
+  }, [])
+
   return (
     <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--page)' }}>
       <Navbar />

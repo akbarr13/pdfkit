@@ -1,7 +1,22 @@
 import type { Metadata } from 'next'
+import { Inter, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 import TopLoader from '@/components/TopLoader'
 import AppLoader from '@/components/AppLoader'
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-roboto-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'pdfkit — free browser-side PDF tools',
@@ -10,12 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="en" className={`${inter.variable} ${robotoMono.variable}`}>
       <body>
         <TopLoader />
         <AppLoader>
