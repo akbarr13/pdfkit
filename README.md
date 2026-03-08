@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# pdfkit
+
+A fast, privacy-first PDF toolkit that runs entirely in your browser. No uploads. No accounts. No server.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
+
+## Features
+
+| Tool | Description |
+|------|-------------|
+| **Compress PDF** | Reduce file size with quality presets (Screen / Web / Print / Custom) |
+| **Merge PDF** | Combine multiple PDFs into one. Drag rows to set order |
+| **Split PDF** | Extract pages or define custom ranges into separate files |
+| **PDF → Image** | Render each page as JPEG or PNG at 72–216 dpi |
+| **Image → PDF** | Pack JPG/PNG files into a single PDF. Drag to set page order |
+
+## Privacy
+
+All processing happens locally in the browser using WebAssembly and Canvas APIs. Files are never sent to any server.
+
+## Tech Stack
+
+- **[Next.js 16](https://nextjs.org/)** — App Router, React 19
+- **[pdf-lib](https://pdf-lib.js.org/)** — PDF creation, merging, splitting
+- **[pdfjs-dist](https://mozilla.github.io/pdf.js/)** — PDF rendering to canvas
+- **[browser-image-compression](https://github.com/Donaldcwl/browser-image-compression)** — JPEG compression for compress tool
+- **[file-saver](https://github.com/eligrey/FileSaver.js/)** — Client-side file downloads
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Run dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Static Hosting (Recommended)
 
-## Learn More
+Change `output` in `next.config.ts` to `'export'`, then:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+# Upload contents of out/ to your web server
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Node.js (cPanel / VPS)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+# Copy .next/standalone + .next/static + public to your server
+# Run: node server.js
+```
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/
+├── page.tsx              # Landing page
+├── compress/page.tsx
+├── merge/page.tsx
+├── split/page.tsx
+├── pdf-to-image/page.tsx
+└── image-to-pdf/page.tsx
+components/
+├── Navbar/
+├── DropZone/             # Drag-and-drop file input
+├── FileList/             # File list with drag-to-reorder
+├── ProgressBar/
+├── ToolLayout/           # Shared page wrapper
+├── ToolUI/               # Err, Ok, ActionBtn components
+└── TopLoader/            # Page transition progress bar
+lib/
+├── mergePdf.ts
+├── splitPdf.ts
+├── compressPdf.ts
+├── pdfToImage.ts
+├── imageToPdf.ts
+└── useHotkey.ts          # Cmd/Ctrl+Enter shortcut
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT
