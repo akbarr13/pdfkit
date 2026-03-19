@@ -1,10 +1,13 @@
-import type { NextConfig } from 'next'
-import path from 'path'
+const path = require('path')
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   output: 'standalone',
   turbopack: {
     root: path.resolve(__dirname),
+    resolveAlias: {
+      jspdf: './node_modules/jspdf/dist/jspdf.umd.min.js',
+    },
   },
   async headers() {
     return [
@@ -34,4 +37,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+module.exports = nextConfig
