@@ -5,6 +5,9 @@ const nextConfig = {
   output: 'standalone',
   turbopack: {
     root: path.resolve(__dirname),
+    resolveAlias: {
+      jspdf: './node_modules/jspdf/dist/jspdf.umd.min.js',
+    },
   },
   async headers() {
     return [
