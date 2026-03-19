@@ -25,7 +25,7 @@ All processing happens locally in the browser using WebAssembly and Canvas APIs.
 
 ## Tech Stack
 
-- **[Next.js 16](https://nextjs.org/)** — App Router, React 19
+- **[Next.js 16](https://nextjs.org/)** — App Router, React 19 (requires Node.js 20+)
 - **[pdf-lib](https://pdf-lib.js.org/)** — PDF creation, merging, splitting
 - **[pdfjs-dist](https://mozilla.github.io/pdf.js/)** — PDF rendering to canvas
 - **[browser-image-compression](https://github.com/Donaldcwl/browser-image-compression)** — JPEG compression for compress tool
@@ -60,10 +60,12 @@ npm run build
 
 ### Node.js (cPanel / VPS)
 
+Requires **Node.js 20+** on the server.
+
 ```bash
 npm run build
-# Copy .next/standalone + .next/static + public to your server
-# Run: node server.js
+# Copy .next/standalone/ + .next/static/ + public/ to your server
+# On the server, run npm install then: node server.js
 ```
 
 ## Project Structure
