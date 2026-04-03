@@ -1,7 +1,6 @@
 import { Client } from 'basic-ftp'
-import { readFileSync, cpSync, rmSync, existsSync } from 'fs'
-import { execSync } from 'child_process'
-
+import { readFileSync, readdirSync, statSync, writeFileSync, rmSync, existsSync, cpSync } from 'fs'
+import { zipSync } from 'fflate'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -26,22 +25,30 @@ const ZIP_PATH = path.join(ROOT, 'deploy.zip')
 console.log('[1/3] Assembling deploy folder...')
 if (existsSync(DEPLOY_DIR)) rmSync(DEPLOY_DIR, { recursive: true, force: true })
 
-// standalone output → deploy/
 cpSync(path.join(ROOT, '.next', 'standalone'), DEPLOY_DIR, { recursive: true })
-// public/ → deploy/public/
 cpSync(path.join(ROOT, 'public'), path.join(DEPLOY_DIR, 'public'), { recursive: true })
-// .next/static/ → deploy/.next/static/
 cpSync(path.join(ROOT, '.next', 'static'), path.join(DEPLOY_DIR, '.next', 'static'), { recursive: true })
 
-// 2. Zip
+// 2. Zip using fflate
 console.log('[2/3] Zipping...')
-if (existsSync(ZIP_PATH)) rmSync(ZIP_PATH)
-const deployWin = DEPLOY_DIR.replace(/\//g, '\\')
-const zipWin = ZIP_PATH.replace(/\//g, '\\')
-execSync(
-  `powershell.exe -NoProfile -Command "Compress-Archive -Path '${deployWin}\\*' -DestinationPath '${zipWin}'"`,
-  { stdio: 'inherit' }
-)
+
+function collectFiles(dir, base = '') {
+  const entries = {}
+  for (const name of readdirSync(dir)) {
+    const abs = path.join(dir, name)
+    const rel = base ? `${base}/${name}` : name
+    if (statSync(abs).isDirectory()) {
+      Object.assign(entries, collectFiles(abs, rel))
+    } else {
+      entries[rel] = readFileSync(abs)
+    }
+  }
+  return entries
+}
+
+const files = collectFiles(DEPLOY_DIR)
+const zip = zipSync(files, { level: 6 })
+writeFileSync(ZIP_PATH, zip)
 
 // 3. Upload deploy.zip to FTP root
 console.log('[3/3] Uploading deploy.zip to FTP root...')
@@ -59,7 +66,7 @@ await client.uploadFrom(ZIP_PATH, 'deploy.zip')
 console.log('Done! deploy.zip uploaded to FTP root.')
 client.close()
 
-// Cleanup local deploy folder and zip
+// Cleanup
 rmSync(DEPLOY_DIR, { recursive: true, force: true })
 rmSync(ZIP_PATH)
 console.log('Local cleanup done.')
