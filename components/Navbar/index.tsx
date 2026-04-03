@@ -20,10 +20,6 @@ export default function Navbar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  // Close menu on navigation
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setOpen(false) }, [pathname])
-
   // Close on Escape
   useEffect(() => {
     if (!open) return
