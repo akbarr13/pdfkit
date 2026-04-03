@@ -87,6 +87,7 @@ export default function FileList({ files, onRemove, onReorder, thumbnails }: Fil
 
             {thumbnails && (
               thumbnails[i]
+                // eslint-disable-next-line @next/next/no-img-element
                 ? <img src={thumbnails[i]} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, display: 'block', border: '1px solid var(--border)' }} />
                 : <div style={{ width: 40, height: 40, background: 'var(--surface-3)', borderRadius: 4, border: '1px solid var(--border)' }} />
             )}

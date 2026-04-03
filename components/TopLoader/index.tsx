@@ -12,6 +12,7 @@ export default function TopLoader() {
 
   useEffect(() => {
     // Start loading
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true)
     setProgress(0)
 

@@ -32,6 +32,11 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(id)
   }, [])
 
+  function finish() {
+    setState('fading')
+    setTimeout(() => setState('done'), 550)
+  }
+
   // Load libraries
   useEffect(() => {
     async function run() {
@@ -47,11 +52,6 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
     }
     run()
   }, [])
-
-  function finish() {
-    setState('fading')
-    setTimeout(() => setState('done'), 550)
-  }
 
   if (state === 'done') return <>{children}</>
 
