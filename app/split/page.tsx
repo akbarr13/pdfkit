@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react'
 import { saveAs } from 'file-saver'
+import { zipSync } from 'fflate'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
 import ProgressBar from '@/components/ProgressBar'
@@ -22,6 +23,7 @@ function parseRanges(text: string): SplitRange[] {
 export default function SplitPage() {
   const [file, setFile]     = useState<File | null>(null)
   const [mode, setMode]     = useState<'pages' | 'ranges'>('pages')
+  const [dlMode, setDlMode] = useState<'zip' | 'bulk'>('zip')
   const [rangesText, setRangesText] = useState('')
   const [status, setStatus] = useState<'idle' | 'processing' | 'done' | 'error'>('idle')
   const [progress, setProgress] = useState({ current: 0, total: 0 })
@@ -46,16 +48,28 @@ export default function SplitPage() {
     setStatus('processing'); setError('')
     try {
       const results = mode === 'pages' ? await splitPdfByPage(file) : await splitPdf(file, parsed)
+      const stem = file.name.replace(/\.pdf$/i, '')
       setProgress({ current: 0, total: results.length })
-      for (let i = 0; i < results.length; i++) {
-        const stem = file.name.replace(/\.pdf$/i, '')
-        saveAs(new Blob([results[i].buffer as ArrayBuffer], { type: 'application/pdf' }), `${stem}_${String(i + 1).padStart(3, '0')}.pdf`)
-        setProgress({ current: i + 1, total: results.length })
-        await new Promise(r => setTimeout(r, 80))
+
+      if (dlMode === 'zip') {
+        const files: Record<string, Uint8Array> = {}
+        for (let i = 0; i < results.length; i++) {
+          files[`${stem}_${String(i + 1).padStart(3, '0')}.pdf`] = results[i]
+          setProgress({ current: i + 1, total: results.length })
+        }
+        const zip = zipSync(files)
+        saveAs(new Blob([zip.buffer as ArrayBuffer], { type: 'application/zip' }), `${stem}_split.zip`)
+      } else {
+        for (let i = 0; i < results.length; i++) {
+          saveAs(new Blob([results[i].buffer as ArrayBuffer], { type: 'application/pdf' }), `${stem}_${String(i + 1).padStart(3, '0')}.pdf`)
+          setProgress({ current: i + 1, total: results.length })
+          await new Promise(r => setTimeout(r, 80))
+        }
       }
+
       setStatus('done')
     } catch (e) { setError(String(e)); setStatus('error') }
-  }, [file, mode, parsed, canSplit])
+  }, [file, mode, dlMode, parsed, canSplit])
 
   useCmdEnter(handleSplit, canSplit)
 
@@ -96,12 +110,20 @@ export default function SplitPage() {
                 </p>
               </div>
             )}
+
+            <div>
+              <label className="section-label">Download as</label>
+              <div className="seg-control">
+                <button onClick={() => setDlMode('zip')} className={`seg-btn${dlMode === 'zip' ? ' active' : ''}`}>ZIP archive</button>
+                <button onClick={() => setDlMode('bulk')} className={`seg-btn${dlMode === 'bulk' ? ' active' : ''}`}>Individual files</button>
+              </div>
+            </div>
           </>
         )}
 
-        {status === 'processing' && <ProgressBar current={progress.current} total={progress.total} label="Downloading" />}
+        {status === 'processing' && <ProgressBar current={progress.current} total={progress.total} label={dlMode === 'zip' ? 'Packing' : 'Downloading'} />}
         {status === 'error'      && <Err msg={error} onRetry={canSplit ? handleSplit : undefined} />}
-        {status === 'done'       && <Ok msg={`${progress.total} file${progress.total > 1 ? 's' : ''} downloaded`} onReset={reset} />}
+        {status === 'done'       && <Ok msg={dlMode === 'zip' ? `${progress.total} files packed → ZIP` : `${progress.total} file${progress.total > 1 ? 's' : ''} downloaded`} onReset={reset} />}
 
         <ActionBtn onClick={handleSplit} disabled={!canSplit} loading={status === 'processing'} hint="⌘ Enter">
           Split PDF →
