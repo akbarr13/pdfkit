@@ -36,7 +36,7 @@ function collectFiles(dir, base = '') {
   const entries = {}
   for (const name of readdirSync(dir)) {
     const abs = path.join(dir, name)
-    const rel = base ? `${base}/${name}` : name
+    const rel = (base ? `${base}/${name}` : name).replace(/\\/g, '/')
     if (statSync(abs).isDirectory()) {
       Object.assign(entries, collectFiles(abs, rel))
     } else {
