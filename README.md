@@ -60,18 +60,24 @@ Open [http://localhost:3000](http://localhost:3000).
 Requires **Node.js 20+** on the server.
 
 ```bash
-npm run build
-# Copy .next/standalone/ + .next/static/ + public/ to your server
-# On the server: node server.js
+# Build, zip, and upload to FTP in one command
+npm run deploy
 ```
-
-### FTP Deploy
 
 Credentials are read from `.env.ftp`:
 
-```bash
-node scripts/deploy-ftp.mjs
 ```
+FTP_HOST=...
+FTP_USER=...
+FTP_PASS=...
+FTP_REMOTE_PATH=...
+```
+
+The script builds a standalone bundle, assembles `standalone/ + public/ + .next/static/` into one folder, zips it, uploads `deploy.zip` to the FTP root, then cleans up locally.
+
+## CI/CD
+
+GitHub Actions runs on every push: **lint → test → build**. See `.github/workflows/ci.yml`.
 
 ## Project Structure
 

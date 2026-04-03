@@ -10,11 +10,9 @@ export function useRecentTools(): [string[], (href: string) => void] {
   const [recents, setRecents] = usePreference<string[]>('recent-tools', [])
 
   const add = useCallback((href: string) => {
-    setRecents(prev => {
-      const filtered = prev.filter(h => h !== href)
-      return [href, ...filtered].slice(0, MAX_RECENTS)
-    })
-  }, [setRecents])
+    const filtered = recents.filter(h => h !== href)
+    setRecents([href, ...filtered].slice(0, MAX_RECENTS))
+  }, [recents, setRecents])
 
   return [recents, add]
 }

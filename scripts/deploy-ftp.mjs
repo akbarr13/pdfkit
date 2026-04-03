@@ -1,11 +1,16 @@
 import { Client } from 'basic-ftp'
-import { readFileSync } from 'fs'
+import { readFileSync, cpSync, rmSync, existsSync } from 'fs'
+import { execSync } from 'child_process'
+
 import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const ROOT = path.resolve(__dirname, '..')
 
 // Load .env.ftp
-const envPath = new URL('../.env.ftp', import.meta.url).pathname.replace(/^\//, '')
 const env = Object.fromEntries(
-  readFileSync(envPath, 'utf8')
+  readFileSync(path.join(ROOT, '.env.ftp'), 'utf8')
     .split('\n')
     .filter(l => l.includes('='))
     .map(l => {
@@ -14,13 +19,35 @@ const env = Object.fromEntries(
     })
 )
 
-const LOCAL_DIR = new URL('../.next/standalone', import.meta.url).pathname.replace(/^\//, '')
-const REMOTE_PATH = env.FTP_REMOTE_PATH
+const DEPLOY_DIR = path.join(ROOT, 'deploy')
+const ZIP_PATH = path.join(ROOT, 'deploy.zip')
 
+// 1. Assemble deploy folder
+console.log('[1/3] Assembling deploy folder...')
+if (existsSync(DEPLOY_DIR)) rmSync(DEPLOY_DIR, { recursive: true, force: true })
+
+// standalone output → deploy/
+cpSync(path.join(ROOT, '.next', 'standalone'), DEPLOY_DIR, { recursive: true })
+// public/ → deploy/public/
+cpSync(path.join(ROOT, 'public'), path.join(DEPLOY_DIR, 'public'), { recursive: true })
+// .next/static/ → deploy/.next/static/
+cpSync(path.join(ROOT, '.next', 'static'), path.join(DEPLOY_DIR, '.next', 'static'), { recursive: true })
+
+// 2. Zip
+console.log('[2/3] Zipping...')
+if (existsSync(ZIP_PATH)) rmSync(ZIP_PATH)
+const deployWin = DEPLOY_DIR.replace(/\//g, '\\')
+const zipWin = ZIP_PATH.replace(/\//g, '\\')
+execSync(
+  `powershell.exe -NoProfile -Command "Compress-Archive -Path '${deployWin}\\*' -DestinationPath '${zipWin}'"`,
+  { stdio: 'inherit' }
+)
+
+// 3. Upload deploy.zip to FTP root
+console.log('[3/3] Uploading deploy.zip to FTP root...')
 const client = new Client()
 client.ftp.verbose = false
 
-console.log('Connecting to FTP...')
 await client.access({
   host: env.FTP_HOST,
   user: env.FTP_USER,
@@ -28,10 +55,11 @@ await client.access({
   secure: false,
 })
 
-console.log(`Uploading to ${REMOTE_PATH} ...`)
-await client.ensureDir(REMOTE_PATH)
-await client.clearWorkingDir()
-await client.uploadFromDir(LOCAL_DIR)
-
-console.log('Done!')
+await client.uploadFrom(ZIP_PATH, 'deploy.zip')
+console.log('Done! deploy.zip uploaded to FTP root.')
 client.close()
+
+// Cleanup local deploy folder and zip
+rmSync(DEPLOY_DIR, { recursive: true, force: true })
+rmSync(ZIP_PATH)
+console.log('Local cleanup done.')

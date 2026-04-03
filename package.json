@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy": "next build && node scripts/deploy-ftp.mjs"
   },
   "dependencies": {
     "browser-image-compression": "^2.0.2",
