@@ -11,18 +11,18 @@ export default function TopLoader() {
   const raf = useRef<number | null>(null)
 
   useEffect(() => {
-    // Start loading
-    setVisible(true)
-    setProgress(0)
-
     let p = 0
-    const tick = () => {
-      // Fast at first, slows down approaching 90%
-      p += (90 - p) * 0.12
-      setProgress(p)
+    const start = () => {
+      setVisible(true)
+      setProgress(0)
+      const tick = () => {
+        p += (90 - p) * 0.12
+        setProgress(p)
+        raf.current = requestAnimationFrame(tick)
+      }
       raf.current = requestAnimationFrame(tick)
     }
-    raf.current = requestAnimationFrame(tick)
+    const startRaf = requestAnimationFrame(start)
 
     // Finish
     timer.current = setTimeout(() => {
@@ -32,6 +32,7 @@ export default function TopLoader() {
     }, 400)
 
     return () => {
+      cancelAnimationFrame(startRaf)
       if (raf.current) cancelAnimationFrame(raf.current)
       if (timer.current) clearTimeout(timer.current)
     }

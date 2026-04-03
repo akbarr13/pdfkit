@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 
 interface FileListProps {
   files: File[]
@@ -87,7 +88,7 @@ export default function FileList({ files, onRemove, onReorder, thumbnails }: Fil
 
             {thumbnails && (
               thumbnails[i]
-                ? <img src={thumbnails[i]} alt="" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4, display: 'block', border: '1px solid var(--border)' }} />
+                ? <Image src={thumbnails[i]} alt="" width={40} height={40} unoptimized style={{ objectFit: 'cover', borderRadius: 4, display: 'block', border: '1px solid var(--border)' }} />
                 : <div style={{ width: 40, height: 40, background: 'var(--surface-3)', borderRadius: 4, border: '1px solid var(--border)' }} />
             )}
 
