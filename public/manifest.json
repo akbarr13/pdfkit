@@ -1,0 +1,24 @@
+{
+  "name": "pdfkit",
+  "short_name": "pdfkit",
+  "description": "Free browser-side PDF tools. No uploads. No accounts. Everything runs locally.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9f8f4",
+  "theme_color": "#ff4400",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    { "name": "Compress PDF", "url": "/compress", "description": "Reduce PDF file size" },
+    { "name": "Merge PDF",    "url": "/merge",    "description": "Combine multiple PDFs" },
+    { "name": "Split PDF",    "url": "/split",    "description": "Extract PDF pages"    },
+    { "name": "Protect PDF",  "url": "/protect",  "description": "Password-protect a PDF" }
+  ]
+}

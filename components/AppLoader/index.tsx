@@ -18,11 +18,18 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
   const [stepLabel, setStepLabel] = useState(STEPS[0].label)
   const [state, setState]         = useState<State>('loading')
   const [symIdx, setSymIdx]       = useState(0)
+  const [showSkip, setShowSkip]   = useState(false)
 
   // Cycle symbols
   useEffect(() => {
     const id = setInterval(() => setSymIdx(i => (i + 1) % SYMBOLS.length), 650)
     return () => clearInterval(id)
+  }, [])
+
+  // Show skip button after 3.5s for returning users with cached libs
+  useEffect(() => {
+    const id = setTimeout(() => setShowSkip(true), 3500)
+    return () => clearTimeout(id)
   }, [])
 
   // Load libraries
@@ -36,12 +43,15 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
         setProgress(accumulated)
       }
       await new Promise(r => setTimeout(r, 250))
-      setState('fading')
-      await new Promise(r => setTimeout(r, 550))
-      setState('done')
+      finish()
     }
     run()
   }, [])
+
+  function finish() {
+    setState('fading')
+    setTimeout(() => setState('done'), 550)
+  }
 
   if (state === 'done') return <>{children}</>
 
@@ -57,7 +67,6 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
         opacity: fading ? 0 : 1,
         transition: fading ? 'opacity 0.55s cubic-bezier(0.4,0,0.2,1)' : 'none',
         pointerEvents: fading ? 'none' : 'all',
-        gap: 0,
         overflow: 'hidden',
       }}>
 
@@ -73,16 +82,11 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
 
         {/* Cycling symbol */}
         <div style={{ marginBottom: 24, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span
-            key={symIdx}
-            style={{
-              fontSize: 56,
-              lineHeight: 1,
-              color: 'var(--accent)',
-              animation: 'symbolPop 0.6s cubic-bezier(0.22,1,0.36,1) both',
-              display: 'inline-block',
-            }}
-          >
+          <span key={symIdx} style={{
+            fontSize: 56, lineHeight: 1, color: 'var(--accent)',
+            animation: 'symbolPop 0.6s cubic-bezier(0.22,1,0.36,1) both',
+            display: 'inline-block',
+          }}>
             {SYMBOLS[symIdx]}
           </span>
         </div>
@@ -100,9 +104,7 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
         <div style={{
           fontFamily: "'Roboto Mono', 'SF Mono', monospace",
           fontSize: 36, fontWeight: 700, letterSpacing: '-0.03em',
-          color: 'var(--text)', marginBottom: 14,
-          transition: 'all 0.3s ease',
-          lineHeight: 1,
+          color: 'var(--text)', marginBottom: 14, transition: 'all 0.3s ease', lineHeight: 1,
         }}>
           {progress}<span style={{ fontSize: 16, color: 'var(--text-3)', fontWeight: 400 }}>%</span>
         </div>
@@ -113,12 +115,7 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
           background: 'var(--border)', borderRadius: 2, overflow: 'hidden',
           marginBottom: 14,
         }}>
-          <div style={{
-            height: '100%', width: `${progress}%`,
-            background: 'var(--accent)', borderRadius: 2,
-            transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1)',
-            boxShadow: '0 0 8px rgba(255,68,0,0.45)',
-          }} />
+          <div className="progress-fill" style={{ width: `${progress}%`, boxShadow: '0 0 8px rgba(255,68,0,0.45)' }} />
         </div>
 
         {/* Step label */}
@@ -131,6 +128,31 @@ export default function AppLoader({ children }: { children: React.ReactNode }) {
           {stepLabel}
         </div>
 
+        {/* Skip button — shown after 3.5s */}
+        {showSkip && (
+          <button
+            onClick={finish}
+            className="mono anim-fade-in"
+            style={{
+              position: 'absolute', bottom: 32,
+              background: 'none', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+              color: 'var(--text-3)', fontSize: 11, padding: '5px 14px',
+              letterSpacing: '0.08em', fontFamily: 'inherit',
+              transition: 'border-color 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'var(--border-2)'
+              e.currentTarget.style.color = 'var(--text-2)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.color = 'var(--text-3)'
+            }}
+          >
+            skip →
+          </button>
+        )}
       </div>
     </>
   )

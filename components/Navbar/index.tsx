@@ -5,12 +5,15 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 const tools = [
-  { href: '/merge',        label: 'Merge' },
-  { href: '/split',        label: 'Split' },
-  { href: '/compress',     label: 'Compress' },
-  { href: '/pdf-to-image', label: 'PDF → Image' },
-  { href: '/image-to-pdf', label: 'Image → PDF' },
-  { href: '/protect',      label: 'Protect' },
+  { href: '/merge',        label: 'Merge'     },
+  { href: '/split',        label: 'Split'     },
+  { href: '/compress',     label: 'Compress'  },
+  { href: '/pdf-to-image', label: 'PDF→Image' },
+  { href: '/image-to-pdf', label: 'Image→PDF' },
+  { href: '/protect',      label: 'Protect'   },
+  { href: '/rotate',       label: 'Rotate'    },
+  { href: '/watermark',    label: 'Watermark' },
+  { href: '/metadata',     label: 'Metadata'  },
 ]
 
 export default function Navbar() {

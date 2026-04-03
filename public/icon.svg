@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#f9f8f4"/>
+  <!-- PDF document shape -->
+  <rect x="128" y="80" width="216" height="280" rx="12" fill="#e8e7e1" stroke="#dedad2" stroke-width="2"/>
+  <rect x="128" y="80" width="216" height="280" rx="12" fill="none" stroke="#c8c5bc" stroke-width="2"/>
+  <!-- Fold corner -->
+  <path d="M296 80 L344 128 L296 128 Z" fill="#dedad2"/>
+  <path d="M296 80 L344 128" stroke="#c8c5bc" stroke-width="2"/>
+  <!-- Lines representing text -->
+  <rect x="156" y="160" width="120" height="8" rx="4" fill="#928f87"/>
+  <rect x="156" y="180" width="148" height="8" rx="4" fill="#928f87"/>
+  <rect x="156" y="200" width="100" height="8" rx="4" fill="#928f87"/>
+  <rect x="156" y="228" width="140" height="8" rx="4" fill="#928f87"/>
+  <rect x="156" y="248" width="120" height="8" rx="4" fill="#928f87"/>
+  <!-- Accent dot / badge -->
+  <circle cx="336" cy="336" r="80" fill="#ff4400"/>
+  <!-- "k" letter in accent circle -->
+  <text x="336" y="362" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="900" fill="white" text-anchor="middle">k</text>
+</svg>

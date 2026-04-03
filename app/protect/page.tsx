@@ -5,9 +5,10 @@ import { saveAs } from 'file-saver'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
 import ProgressBar from '@/components/ProgressBar'
-import { Err, Ok, ActionBtn } from '@/components/ToolUI'
+import { Err, Ok, ActionBtn, PasswordStrength } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { protectPdf } from '@/lib/protectPdf'
+import { validatePdf, passwordStrength } from '@/lib/validate'
 
 function fmt(b: number) {
   if (b < 1024) return b + ' B'
@@ -16,17 +17,24 @@ function fmt(b: number) {
 }
 
 export default function ProtectPage() {
-  const [file, setFile]           = useState<File | null>(null)
-  const [password, setPassword]   = useState('')
-  const [confirm, setConfirm]     = useState('')
-  const [showPwd, setShowPwd]     = useState(false)
-  const [status, setStatus]       = useState<'idle' | 'processing' | 'done' | 'error'>('idle')
-  const [progress, setProgress]   = useState({ current: 0, total: 0 })
-  const [error, setError]         = useState('')
+  const [file, setFile]         = useState<File | null>(null)
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm]   = useState('')
+  const [showPwd, setShowPwd]   = useState(false)
+  const [status, setStatus]     = useState<'idle' | 'processing' | 'done' | 'error'>('idle')
+  const [progress, setProgress] = useState({ current: 0, total: 0 })
+  const [error, setError]       = useState('')
   const [resultMsg, setResultMsg] = useState('')
 
   const mismatch  = confirm.length > 0 && password !== confirm
+  const strength  = passwordStrength(password)
   const canSubmit = !!file && password.length > 0 && !mismatch && status !== 'processing'
+
+  function handleFiles([f]: File[]) {
+    const err = validatePdf(f)
+    if (err) { setError(err); setStatus('error'); return }
+    setFile(f); setStatus('idle'); setError('')
+  }
 
   function reset() { setFile(null); setPassword(''); setConfirm(''); setStatus('idle'); setError('') }
 
@@ -35,7 +43,7 @@ export default function ProtectPage() {
     setStatus('processing'); setError('')
     try {
       const bytes = await protectPdf(file, password, password, (c, t) => setProgress({ current: c, total: t }))
-      const stem = file.name.replace(/\.pdf$/i, '')
+      const stem  = file.name.replace(/\.pdf$/i, '')
       saveAs(new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' }), `${stem}_protected.pdf`)
       setResultMsg(`${stem}_protected.pdf saved · ${fmt(bytes.length)}`)
       setStatus('done')
@@ -56,18 +64,18 @@ export default function ProtectPage() {
   return (
     <ToolLayout code="06 / PROTECT" title="Protect PDF"
       subtitle="Lock a PDF with a password. Pages are rendered as images — text won't be selectable after.">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div className="tool-stack">
 
         {!file ? (
-          <DropZone accept=".pdf" onFiles={([f]) => setFile(f)} label="Drop a PDF file here" />
+          <DropZone accept=".pdf" onFiles={handleFiles} label="Drop a PDF file here" />
         ) : (
           <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--surface)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px' }}>
-              <div style={{ flex: 1, overflow: 'hidden' }}>
-                <p style={{ fontSize: 13, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
-                <p className="mono" style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 2 }}>{fmt(file.size)}</p>
+            <div className="file-info-row" style={{ border: 'none', borderRadius: 0 }}>
+              <div className="file-info-row__body">
+                <p className="file-name">{file.name}</p>
+                <p className="mono file-size">{fmt(file.size)}</p>
               </div>
-              <button onClick={reset} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', fontSize: 12, fontFamily: 'inherit' }}>change</button>
+              <button onClick={reset} className="change-btn">change</button>
             </div>
           </div>
         )}
@@ -76,7 +84,7 @@ export default function ProtectPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {/* Password */}
             <div>
-              <p style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 6, fontWeight: 500 }}>Password</p>
+              <p className="section-label">Password</p>
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPwd ? 'text' : 'password'}
@@ -85,6 +93,8 @@ export default function ProtectPage() {
                   onChange={e => setPassword(e.target.value)}
                   style={inputStyle}
                   autoComplete="new-password"
+                  onFocus={e => { if (!mismatch || !confirm.length) e.target.style.borderColor = 'var(--accent)' }}
+                  onBlur={e => { e.target.style.borderColor = mismatch && confirm.length > 0 ? '#fcc' : 'var(--border)' }}
                 />
                 <button
                   type="button"
@@ -99,11 +109,12 @@ export default function ProtectPage() {
                   {showPwd ? 'hide' : 'show'}
                 </button>
               </div>
+              <PasswordStrength strength={strength} password={password} />
             </div>
 
             {/* Confirm */}
             <div>
-              <p style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 6, fontWeight: 500 }}>
+              <p className="section-label">
                 Confirm password
                 {mismatch && <span style={{ color: '#e03333', marginLeft: 8, fontWeight: 400 }}>— passwords don&apos;t match</span>}
               </p>
@@ -114,13 +125,15 @@ export default function ProtectPage() {
                 onChange={e => setConfirm(e.target.value)}
                 style={inputStyle}
                 autoComplete="new-password"
+                onFocus={e => { if (!mismatch || !confirm.length) e.target.style.borderColor = 'var(--accent)' }}
+                onBlur={e => { e.target.style.borderColor = mismatch && confirm.length > 0 ? '#fcc' : 'var(--border)' }}
               />
             </div>
           </div>
         )}
 
         {status === 'processing' && <ProgressBar current={progress.current} total={progress.total} label="Protecting pages" />}
-        {status === 'error'      && <Err msg={error} />}
+        {status === 'error'      && <Err msg={error} onRetry={canSubmit ? handleProtect : undefined} />}
         {status === 'done'       && <Ok msg={resultMsg} onReset={reset} />}
 
         <ActionBtn onClick={handleProtect} disabled={!canSubmit} loading={status === 'processing'} hint="⌘ Enter">

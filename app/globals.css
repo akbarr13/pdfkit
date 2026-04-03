@@ -38,16 +38,22 @@ a { color: inherit; text-decoration: none; }
 .mono { font-family: var(--font-roboto-mono), 'SF Mono', monospace; }
 
 /* ─── Animations ─── */
-@keyframes fadeUp   { from { opacity:0; transform:translateY(18px) } to { opacity:1; transform:translateY(0) } }
-@keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
-@keyframes slideLeft{ from { opacity:0; transform:translateX(-14px) } to { opacity:1; transform:translateX(0) } }
-@keyframes scaleIn  { from { opacity:0; transform:scale(0.96) } to { opacity:1; transform:scale(1) } }
-@keyframes spin     { to { transform:rotate(360deg) } }
+@keyframes fadeUp    { from { opacity:0; transform:translateY(18px) } to { opacity:1; transform:translateY(0) } }
+@keyframes fadeDown  { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:translateY(0) } }
+@keyframes fadeIn    { from { opacity:0 } to { opacity:1 } }
+@keyframes slideLeft { from { opacity:0; transform:translateX(-14px) } to { opacity:1; transform:translateX(0) } }
+@keyframes scaleIn   { from { opacity:0; transform:scale(0.96) } to { opacity:1; transform:scale(1) } }
+@keyframes spin      { to { transform:rotate(360deg) } }
+@keyframes shimmer   { 0% { background-position:-200% center } 100% { background-position:200% center } }
+@keyframes pulse-soft{ 0%,100% { opacity:1 } 50% { opacity:0.6 } }
+@keyframes pop       { 0% { transform:scale(0.85); opacity:0 } 60% { transform:scale(1.06) } 100% { transform:scale(1); opacity:1 } }
 
 .anim-fade-up    { animation: fadeUp    0.5s cubic-bezier(0.22,1,0.36,1) both; }
 .anim-fade-in    { animation: fadeIn    0.35s ease both; }
+.anim-fade-down  { animation: fadeDown  0.3s cubic-bezier(0.22,1,0.36,1) both; }
 .anim-slide-left { animation: slideLeft 0.45s cubic-bezier(0.22,1,0.36,1) both; }
 .anim-scale-in   { animation: scaleIn   0.4s cubic-bezier(0.22,1,0.36,1) both; }
+.anim-pop        { animation: pop       0.4s cubic-bezier(0.22,1,0.36,1) both; }
 
 .delay-0 { animation-delay:   0ms; }
 .delay-1 { animation-delay:  70ms; }
@@ -174,4 +180,150 @@ a { color: inherit; text-decoration: none; }
   .nav-desktop { display: none; }
   .nav-hamburger { display: flex; margin-left: auto; }
   .grid-4col { grid-template-columns: repeat(2, 1fr); }
+  .change-btn { min-height: 44px; padding: 4px 12px; }
+}
+
+/* ─── Focus rings (accessibility) ─── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Shared tool page primitives ─── */
+.tool-stack { display: flex; flex-direction: column; gap: 14px; }
+
+.file-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.file-info-row__body {
+  flex: 1;
+  overflow: hidden;
+}
+
+.file-name {
+  font-size: 13px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.change-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 12px;
+  font-family: inherit;
+  padding: 4px 8px;
+  transition: color 0.12s;
+  flex-shrink: 0;
+}
+.change-btn:hover { color: var(--text); }
+
+.section-label {
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--accent); }
+
+/* ─── Segment control ─── */
+.seg-control {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-family: inherit;
+  transition: background 0.12s, color 0.12s;
+}
+.seg-btn:not(:last-child) { border-right: 1px solid var(--border); }
+.seg-btn.active { background: var(--accent); color: #fff; }
+
+/* ─── Preset grid button ─── */
+.preset-btn {
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.12s;
+}
+.preset-btn.active {
+  background: rgba(255,68,0,0.06);
+  border-color: rgba(255,68,0,0.35);
+}
+
+/* ─── Progress shimmer ─── */
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent) 0%, #ff7040 50%, var(--accent) 100%);
+  background-size: 200% 100%;
+  border-radius: 2px;
+  transition: width 0.25s ease;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* ─── Page-drop overlay ─── */
+.page-drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(249,248,244,0.94);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.12s ease both;
+  pointer-events: none;
+}
+.page-drop-overlay__inner {
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  padding: 48px 64px;
+  text-align: center;
+  animation: scaleIn 0.2s cubic-bezier(0.22,1,0.36,1) both;
 }
