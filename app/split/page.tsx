@@ -6,6 +6,7 @@ import { zipSync } from 'fflate'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
 import ProgressBar from '@/components/ProgressBar'
+import SelectedFileCard from '@/components/SelectedFileCard'
 import { Err, Ok, ActionBtn } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { splitPdf, splitPdfByPage, SplitRange } from '@/lib/splitPdf'
@@ -73,6 +74,8 @@ export default function SplitPage() {
 
   useCmdEnter(handleSplit, canSplit)
 
+  const rangeInputCls = `form-input${rangeInvalid ? ' form-input--error' : ''}`
+
   return (
     <ToolLayout code="02 / SPLIT" title="Split PDF" subtitle="Extract individual pages, or define custom page ranges.">
       <div className="tool-stack">
@@ -80,10 +83,7 @@ export default function SplitPage() {
         {!file ? (
           <DropZone accept=".pdf" onFiles={handleFiles} label="Drop a PDF file here" />
         ) : (
-          <div className="file-info-row">
-            <span className="file-name">{file.name}</span>
-            <button onClick={reset} className="change-btn">change file</button>
-          </div>
+          <SelectedFileCard file={file} onChange={reset} showSize={false} />
         )}
 
         {file && (
@@ -95,17 +95,22 @@ export default function SplitPage() {
 
             {mode === 'ranges' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                  <label className="section-label" style={{ marginBottom: 0 }}>Page ranges — comma-separated</label>
-                  {preview && <span className="mono" style={{ fontSize: 11, color: rangeInvalid ? '#c0392b' : 'var(--accent)' }}>{preview}</span>}
+                <div className="range-row">
+                  <label className="section-label section-label--inline">Page ranges — comma-separated</label>
+                  {preview && (
+                    <span className="mono range-value" style={{ color: rangeInvalid ? '#c0392b' : 'var(--accent)' }}>
+                      {preview}
+                    </span>
+                  )}
                 </div>
-                <input type="text" value={rangesText} onChange={e => setRangesText(e.target.value)}
+                <input
+                  type="text"
+                  value={rangesText}
+                  onChange={e => setRangesText(e.target.value)}
                   placeholder="1-3, 4-6, 7"
-                  className="form-input"
-                  style={{ borderColor: rangeInvalid ? '#f5c6c6' : undefined }}
-                  onFocus={e => (e.target.style.borderColor = rangeInvalid ? '#e07070' : 'var(--accent)')}
-                  onBlur={e => (e.target.style.borderColor = rangeInvalid ? '#f5c6c6' : 'var(--border)')} />
-                <p className="mono" style={{ marginTop: 5, fontSize: 10, color: 'var(--text-3)' }}>
+                  className={rangeInputCls}
+                />
+                <p className="mono help-line">
                   each range → one PDF · single page: 7 · range: 2-5
                 </p>
               </div>

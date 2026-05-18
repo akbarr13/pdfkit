@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { saveAs } from 'file-saver'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
+import SelectedFileCard from '@/components/SelectedFileCard'
 import { Err, Ok, ActionBtn } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { getPdfMetadata, editMetadata, PdfMetadata } from '@/lib/editMetadata'
@@ -65,20 +66,15 @@ export default function MetadataPage() {
         {!file ? (
           <DropZone accept=".pdf" onFiles={handleFiles} label="Drop a PDF file here" />
         ) : (
-          <div className="file-info-row">
-            <span className="file-name">{file.name}</span>
-            <button onClick={reset} className="change-btn">change file</button>
-          </div>
+          <SelectedFileCard file={file} onChange={reset} showSize={false} />
         )}
 
         {file && loading && (
-          <div className="mono" style={{ padding: '10px 14px', fontSize: 11, color: 'var(--text-3)', textAlign: 'center', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', background: 'var(--surface)' }}>
-            reading metadata...
-          </div>
+          <div className="mono meta-line">reading metadata...</div>
         )}
 
         {file && !loading && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="tool-stack tool-stack--tight">
             {FIELDS.map(f => (
               <div key={f.key}>
                 <p className="section-label">{f.label}</p>

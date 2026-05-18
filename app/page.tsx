@@ -24,9 +24,7 @@ function highlight(text: string, query: string) {
   return (
     <>
       {text.slice(0, idx)}
-      <mark style={{ background: 'rgba(255,68,0,0.15)', color: 'var(--accent)', borderRadius: 2, padding: '0 1px' }}>
-        {text.slice(idx, idx + query.length)}
-      </mark>
+      <mark className="home-mark">{text.slice(idx, idx + query.length)}</mark>
       {text.slice(idx + query.length)}
     </>
   )
@@ -45,22 +43,17 @@ function ToolCard({ tool, index, query }: { tool: typeof tools[0]; index: number
 
   return (
     <Link ref={ref} href={tool.href} onMouseMove={onMouseMove} className={`tool-card anim-scale-in ${delayClass}`}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <span className="mono" style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.1em' }}>{tool.code}</span>
-        <span className="card-symbol" style={{ fontSize: 24, lineHeight: 1, color: 'var(--border-2)', transition: 'color 0.2s' }}>{tool.symbol}</span>
+      <div className="tool-card__top">
+        <span className="mono tool-card__code">{tool.code}</span>
+        <span className="card-symbol tool-card__symbol">{tool.symbol}</span>
       </div>
-      <div style={{ flex: 1 }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 6, letterSpacing: '-0.02em' }}>
-          {highlight(tool.label, query)}
-        </h2>
-        <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.65 }}>
-          {highlight(tool.desc, query)}
-        </p>
+      <div className="tool-card__main">
+        <h2 className="tool-card__title">{highlight(tool.label, query)}</h2>
+        <p className="tool-card__desc">{highlight(tool.desc, query)}</p>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <span className="card-arrow" style={{ fontSize: 17, color: 'var(--border-2)', transition: 'color 0.2s, transform 0.2s', display: 'inline-block' }}>→</span>
+      <div className="tool-card__arrow-row">
+        <span className="card-arrow tool-card__arrow">→</span>
       </div>
-      <style>{`.tool-card:hover .card-symbol { color: var(--accent) !important; }`}</style>
     </Link>
   )
 }
@@ -101,35 +94,25 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', background: 'var(--page)' }}>
+    <div className="app-shell">
       <Navbar />
 
-      <main style={{ flex: 1, maxWidth: 860, margin: '0 auto', padding: '0 24px', width: '100%' }}>
-
-        {/* Hero */}
-        <div style={{ padding: '48px 0 40px', borderBottom: '1px solid var(--border)' }}>
-          <p className="mono anim-slide-left delay-0" style={{ fontSize: 11, color: 'var(--accent)', letterSpacing: '0.13em', marginBottom: 14 }}>
+      <main className="home-main">
+        <div className="home-hero">
+          <p className="mono home-hero__eyebrow anim-slide-left delay-0">
             FREE · NO UPLOAD · NO ACCOUNT
           </p>
-          <h1 className="anim-fade-up delay-1" style={{
-            fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 800,
-            lineHeight: 1.15, letterSpacing: '-0.025em',
-            color: 'var(--text)', marginBottom: 10,
-          }}>
-            iLovePDF loves your data. <span style={{ color: 'var(--accent)' }}>We don&apos;t.</span>
+          <h1 className="home-hero__title anim-fade-up delay-1">
+            iLovePDF loves your data. <span className="home-hero__title-accent">We don&apos;t.</span>
           </h1>
-          <p className="anim-fade-up delay-2" style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.65 }}>
+          <p className="home-hero__subtitle anim-fade-up delay-2">
             Everything runs in your browser. Your PDFs never leave your device.
           </p>
         </div>
 
-        {/* Search bar */}
-        <div className="anim-fade-up delay-3" style={{ padding: '24px 0 0' }}>
-          <div style={{ position: 'relative' }}>
-            <span style={{
-              position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-              fontSize: 14, color: 'var(--text-3)', pointerEvents: 'none',
-            }}>⌕</span>
+        <div className="home-search anim-fade-up delay-3">
+          <div className="home-search__wrap">
+            <span className="home-search__icon">⌕</span>
             <input
               ref={inputRef}
               type="text"
@@ -137,101 +120,53 @@ export default function HomePage() {
               onChange={e => setQuery(e.target.value)}
               placeholder="Search tools…"
               aria-label="Search tools"
-              style={{
-                width: '100%', padding: '9px 36px 9px 32px',
-                background: 'var(--surface)', border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)', color: 'var(--text)',
-                fontSize: 14, outline: 'none', fontFamily: 'inherit',
-                transition: 'border-color 0.15s, box-shadow 0.15s',
-              }}
-              onFocus={e => {
-                e.target.style.borderColor = 'var(--accent)'
-                e.target.style.boxShadow = '0 0 0 3px rgba(255,68,0,0.08)'
-              }}
-              onBlur={e => {
-                e.target.style.borderColor = 'var(--border)'
-                e.target.style.boxShadow = 'none'
-              }}
+              className="home-search__input"
             />
             {query ? (
               <button
                 onClick={() => { setQuery(''); inputRef.current?.focus() }}
                 aria-label="Clear search"
-                style={{
-                  position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: 'var(--text-3)', fontSize: 16, lineHeight: 1, padding: '2px 4px',
-                }}
+                className="home-search__clear"
               >×</button>
             ) : (
-              <kbd style={{
-                position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-                fontSize: 10, color: 'var(--text-3)', background: 'var(--surface-2)',
-                border: '1px solid var(--border)', borderRadius: 3,
-                padding: '2px 5px', fontFamily: 'inherit', pointerEvents: 'none',
-              }}>/</kbd>
+              <kbd className="home-search__kbd">/</kbd>
             )}
           </div>
         </div>
 
-        {/* Recently used */}
         {!query && recentTools.length > 0 && (
-          <div className="anim-fade-in" style={{ padding: '16px 0 0', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.08em' }}>RECENT</span>
+          <div className="home-recent anim-fade-in">
+            <span className="mono home-recent__label">RECENT</span>
             {recentTools.map(t => (
-              <Link key={t.href} href={t.href} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '4px 10px', fontSize: 12, fontWeight: 500,
-                background: 'var(--surface)', border: '1px solid var(--border)',
-                borderRadius: 99, color: 'var(--text-2)',
-                transition: 'border-color 0.15s, color 0.15s, background 0.15s',
-              }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLAnchorElement
-                el.style.borderColor = 'rgba(255,68,0,0.3)'
-                el.style.color = 'var(--accent)'
-                el.style.background = 'rgba(255,68,0,0.04)'
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLAnchorElement
-                el.style.borderColor = 'var(--border)'
-                el.style.color = 'var(--text-2)'
-                el.style.background = 'var(--surface)'
-              }}>
-                <span style={{ fontSize: 13 }}>{t.symbol}</span>
+              <Link key={t.href} href={t.href} className="home-recent__pill">
+                <span className="home-recent__pill-symbol">{t.symbol}</span>
                 {t.label}
               </Link>
             ))}
           </div>
         )}
 
-        {/* Tool cards */}
         {filtered.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 10, padding: '16px 0 64px' }}>
+          <div className="home-grid">
             {filtered.map((t, i) => <ToolCard key={t.href} tool={t} index={i} query={query.trim()} />)}
           </div>
         ) : (
-          <div style={{ padding: '64px 0', textAlign: 'center' }}>
-            <p style={{ fontSize: 28, marginBottom: 10 }}>⊘</p>
-            <p style={{ fontSize: 14, color: 'var(--text-2)', marginBottom: 6 }}>
+          <div className="home-empty">
+            <p className="home-empty__icon">⊘</p>
+            <p className="home-empty__msg">
               No tools match <strong>&ldquo;{query}&rdquo;</strong>
             </p>
-            <button
-              onClick={() => setQuery('')}
-              className="mono"
-              style={{
-                fontSize: 11, color: 'var(--accent)', background: 'none', border: 'none',
-                cursor: 'pointer', letterSpacing: '0.06em', padding: '4px 8px',
-              }}
-            >clear search</button>
+            <button onClick={() => setQuery('')} className="mono home-empty__clear">
+              clear search
+            </button>
           </div>
         )}
       </main>
 
-      <footer style={{ borderTop: '1px solid var(--border)', padding: '14px 24px', background: 'var(--surface)' }}>
-        <div style={{ maxWidth: 860, margin: '0 auto', display: 'flex', justifyContent: 'space-between' }}>
-          <span className="mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>pdfkit — client-side only</span>
-          <span className="mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>files never leave your device</span>
+      <footer className="app-footer">
+        <div className="app-footer__row">
+          <span className="mono app-footer__note">pdfkit — client-side only</span>
+          <span className="mono app-footer__note">files never leave your device</span>
         </div>
       </footer>
     </div>

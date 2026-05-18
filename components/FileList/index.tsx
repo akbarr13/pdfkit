@@ -2,17 +2,13 @@
 
 import { useState, useRef } from 'react'
 import Image from 'next/image'
+import { formatBytes } from '@/lib/format'
 
 interface FileListProps {
   files: File[]
   onRemove: (index: number) => void
   onReorder?: (from: number, to: number) => void
   thumbnails?: string[]
-}
-
-function fmt(b: number) {
-  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB'
-  return (b / (1024 * 1024)).toFixed(2) + ' MB'
 }
 
 export default function FileList({ files, onRemove, onReorder, thumbnails }: FileListProps) {
@@ -44,24 +40,25 @@ export default function FileList({ files, onRemove, onReorder, thumbnails }: Fil
   const colTemplate = thumbnails ? '24px 48px 1fr 64px 28px' : '24px 1fr 64px 28px'
 
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden', background: 'var(--surface)' }}>
-      {/* Header */}
-      <div className="mono" style={{
-        display: 'grid', gridTemplateColumns: colTemplate, gap: 10,
-        padding: '7px 14px', background: 'var(--surface-2)',
-        borderBottom: '1px solid var(--border)',
-        fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.08em', alignItems: 'center',
-      }}>
+    <div className="file-list">
+      <div className="mono file-list__head" style={{ gridTemplateColumns: colTemplate }}>
         <span>#</span>
         {thumbnails && <span />}
         <span>FILE</span>
-        <span style={{ textAlign: 'right' }}>SIZE</span>
+        <span className="file-list__head--right">SIZE</span>
         <span />
       </div>
 
       {files.map((f, i) => {
         const isDragging = dragIdx === i
         const isOver = overIdx === i && dragIdx !== null && dragIdx !== i
+        const rowCls = [
+          'file-list__row',
+          onReorder ? 'is-draggable' : '',
+          isDragging ? 'is-dragging' : '',
+          isOver && overIdx! < dragIdx! ? 'is-over' : '',
+        ].filter(Boolean).join(' ')
+
         return (
           <div
             key={i}
@@ -71,63 +68,34 @@ export default function FileList({ files, onRemove, onReorder, thumbnails }: Fil
             onDragOver={e => handleDragOver(e, i)}
             onDrop={e => handleDrop(e, i)}
             onDragEnd={handleDragEnd}
-            style={{
-              display: 'grid', gridTemplateColumns: colTemplate, gap: 10,
-              padding: '10px 14px', alignItems: 'center',
-              background: isDragging ? 'var(--surface-3)' : i % 2 === 0 ? 'var(--surface)' : 'var(--surface-2)',
-              borderBottom: i < files.length - 1 ? '1px solid var(--border)' : 'none',
-              borderTop: isOver && overIdx! < dragIdx! ? '2px solid var(--accent)' : '2px solid transparent',
-              cursor: onReorder ? 'grab' : 'default',
-              transition: 'background 0.1s',
-              userSelect: 'none',
-            }}
+            className={rowCls}
+            style={{ gridTemplateColumns: colTemplate }}
           >
-            <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>
+            <span className="mono file-list__num">
               {String(i + 1).padStart(2, '0')}
             </span>
 
             {thumbnails && (
               thumbnails[i]
-                ? <Image src={thumbnails[i]} alt="" width={40} height={40} unoptimized style={{ objectFit: 'cover', borderRadius: 4, display: 'block', border: '1px solid var(--border)' }} />
-                : <div style={{ width: 40, height: 40, background: 'var(--surface-3)', borderRadius: 4, border: '1px solid var(--border)' }} />
+                ? <Image src={thumbnails[i]} alt="" width={40} height={40} unoptimized className="file-list__thumb-img" />
+                : <div className="file-list__thumb-empty" />
             )}
 
-            <span style={{ fontSize: 13, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={f.name}>
-              {f.name}
-            </span>
+            <span className="file-list__name" title={f.name}>{f.name}</span>
 
-            <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)', textAlign: 'right' }}>
-              {fmt(f.size)}
-            </span>
+            <span className="mono file-list__size">{formatBytes(f.size)}</span>
 
-            <button onClick={e => { e.stopPropagation(); onRemove(i) }} title="Remove"
-              style={{
-                width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'none', border: '1px solid transparent', borderRadius: 4,
-                cursor: 'pointer', color: 'var(--text-3)', fontSize: 15, transition: 'all 0.1s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = '#cc2222'
-                e.currentTarget.style.borderColor = 'rgba(200,40,40,0.2)'
-                e.currentTarget.style.background = 'rgba(200,40,40,0.06)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = 'var(--text-3)'
-                e.currentTarget.style.borderColor = 'transparent'
-                e.currentTarget.style.background = 'none'
-              }}>×</button>
+            <button
+              onClick={e => { e.stopPropagation(); onRemove(i) }}
+              title="Remove"
+              className="file-list__remove"
+            >×</button>
           </div>
         )
       })}
 
       {onReorder && files.length > 1 && (
-        <div className="mono" style={{
-          padding: '5px 14px', background: 'var(--surface-2)',
-          borderTop: '1px solid var(--border)',
-          fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.06em',
-        }}>
-          drag rows to reorder
-        </div>
+        <div className="mono file-list__hint">drag rows to reorder</div>
       )}
     </div>
   )

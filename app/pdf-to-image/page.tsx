@@ -6,6 +6,7 @@ import { zipSync } from 'fflate'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
 import ProgressBar from '@/components/ProgressBar'
+import SelectedFileCard from '@/components/SelectedFileCard'
 import { Err, Ok, ActionBtn } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { pdfToImages } from '@/lib/pdfToImage'
@@ -76,10 +77,7 @@ export default function PdfToImagePage() {
         {!file ? (
           <DropZone accept=".pdf" onFiles={handleFiles} label="Drop a PDF file here" />
         ) : (
-          <div className="file-info-row">
-            <span className="file-name">{file.name}</span>
-            <button onClick={reset} className="change-btn">change file</button>
-          </div>
+          <SelectedFileCard file={file} onChange={reset} showSize={false} />
         )}
 
         {file && (
@@ -88,10 +86,10 @@ export default function PdfToImagePage() {
               <p className="section-label">Format</p>
               <div className="seg-control">
                 <button onClick={() => setFormat('jpeg')} className={`seg-btn${format === 'jpeg' ? ' active' : ''}`}>
-                  JPEG &nbsp;<span style={{ fontWeight: 400, fontSize: 11, opacity: 0.75 }}>smaller, lossy</span>
+                  JPEG &nbsp;<span className="seg-btn__hint">smaller, lossy</span>
                 </button>
                 <button onClick={() => setFormat('png')} className={`seg-btn${format === 'png' ? ' active' : ''}`}>
-                  PNG &nbsp;<span style={{ fontWeight: 400, fontSize: 11, opacity: 0.75 }}>lossless, larger</span>
+                  PNG &nbsp;<span className="seg-btn__hint">lossless, larger</span>
                 </button>
               </div>
             </div>
@@ -109,8 +107,8 @@ export default function PdfToImagePage() {
               <div className="grid-4col">
                 {scales.map(s => (
                   <button key={s.value} onClick={() => setScale(s.value)} className={`preset-btn${scale === s.value ? ' active' : ''}`}>
-                    <p className="mono" style={{ fontSize: 12, fontWeight: 600, color: scale === s.value ? 'var(--accent)' : 'var(--text)', marginBottom: 2 }}>{s.label}</p>
-                    <p className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>{s.note}</p>
+                    <p className="mono preset-btn__title-mono">{s.label}</p>
+                    <p className="mono preset-btn__note">{s.note}</p>
                   </button>
                 ))}
               </div>

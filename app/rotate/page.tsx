@@ -4,15 +4,11 @@ import { useState, useCallback } from 'react'
 import { saveAs } from 'file-saver'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
+import SelectedFileCard from '@/components/SelectedFileCard'
 import { Err, Ok, ActionBtn } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { rotatePdf, RotateAngle } from '@/lib/rotatePdf'
 import { validatePdf } from '@/lib/validate'
-
-function fmt(b: number) {
-  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB'
-  return (b / (1024 * 1024)).toFixed(2) + ' MB'
-}
 
 const angles: { value: RotateAngle; label: string; symbol: string; note: string }[] = [
   { value: 90,  label: '90°',  symbol: '↻', note: 'clockwise'  },
@@ -57,15 +53,7 @@ export default function RotatePage() {
         {!file ? (
           <DropZone accept=".pdf" onFiles={handleFiles} label="Drop a PDF file here" />
         ) : (
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--surface)' }}>
-            <div className="file-info-row" style={{ border: 'none', borderRadius: 0 }}>
-              <div className="file-info-row__body">
-                <p className="file-name">{file.name}</p>
-                <p className="mono file-size">{fmt(file.size)}</p>
-              </div>
-              <button onClick={reset} className="change-btn">change</button>
-            </div>
-          </div>
+          <SelectedFileCard file={file} onChange={reset} />
         )}
 
         {file && (
@@ -73,16 +61,14 @@ export default function RotatePage() {
             <p className="section-label">Rotation</p>
             <div style={{ display: 'flex', gap: 8 }}>
               {angles.map(a => (
-                <button key={a.value} onClick={() => setAngle(a.value)}
-                  className={`preset-btn${angle === a.value ? ' active' : ''}`}
-                  style={{ flex: 1 }}>
-                  <p style={{ fontSize: 28, marginBottom: 6, color: angle === a.value ? 'var(--accent)' : 'var(--text-3)', transition: 'color 0.12s', lineHeight: 1 }}>
-                    {a.symbol}
-                  </p>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: angle === a.value ? 'var(--accent)' : 'var(--text)', marginBottom: 2 }}>
-                    {a.label}
-                  </p>
-                  <p className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>{a.note}</p>
+                <button
+                  key={a.value}
+                  onClick={() => setAngle(a.value)}
+                  className={`preset-btn preset-btn--flex preset-btn--lg${angle === a.value ? ' active' : ''}`}
+                >
+                  <p className="preset-btn__symbol">{a.symbol}</p>
+                  <p className="preset-btn__title">{a.label}</p>
+                  <p className="mono preset-btn__note">{a.note}</p>
                 </button>
               ))}
             </div>

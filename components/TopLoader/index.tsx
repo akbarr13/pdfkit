@@ -40,19 +40,14 @@ export default function TopLoader() {
 
   if (!visible) return null
 
+  const done = progress === 100
+
   return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
-      height: 2, pointerEvents: 'none',
-    }}>
-      <div style={{
-        height: '100%',
-        width: `${progress}%`,
-        background: 'var(--accent)',
-        transition: progress === 100 ? 'width 0.1s ease, opacity 0.3s ease' : 'width 0.1s linear',
-        opacity: progress === 100 ? 0 : 1,
-        boxShadow: '0 0 8px rgba(255,68,0,0.6)',
-      }} />
+    <div className="top-loader">
+      <div
+        className={`top-loader__bar top-loader__bar--${done ? 'done' : 'running'}`}
+        style={{ width: `${progress}%` }}
+      />
     </div>
   )
 }

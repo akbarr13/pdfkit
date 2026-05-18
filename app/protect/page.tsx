@@ -5,16 +5,12 @@ import { saveAs } from 'file-saver'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
 import ProgressBar from '@/components/ProgressBar'
+import SelectedFileCard from '@/components/SelectedFileCard'
 import { Err, Ok, ActionBtn, PasswordStrength } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { protectPdf } from '@/lib/protectPdf'
 import { validatePdf, passwordStrength } from '@/lib/validate'
-
-function fmt(b: number) {
-  if (b < 1024) return b + ' B'
-  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB'
-  return (b / (1024 * 1024)).toFixed(2) + ' MB'
-}
+import { formatBytes } from '@/lib/format'
 
 export default function ProtectPage() {
   const [file, setFile]         = useState<File | null>(null)
@@ -45,21 +41,14 @@ export default function ProtectPage() {
       const bytes = await protectPdf(file, password, password, (c, t) => setProgress({ current: c, total: t }))
       const stem  = file.name.replace(/\.pdf$/i, '')
       saveAs(new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' }), `${stem}_protected.pdf`)
-      setResultMsg(`${stem}_protected.pdf saved · ${fmt(bytes.length)}`)
+      setResultMsg(`${stem}_protected.pdf saved · ${formatBytes(bytes.length)}`)
       setStatus('done')
     } catch (e) { setError(String(e)); setStatus('error') }
   }, [file, password, canSubmit])
 
   useCmdEnter(handleProtect, canSubmit)
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 12px', fontSize: 14,
-    background: 'var(--surface)', color: 'var(--text)',
-    border: `1px solid ${mismatch && confirm.length > 0 ? '#fcc' : 'var(--border)'}`,
-    borderRadius: 'var(--radius-sm)', outline: 'none',
-    fontFamily: 'inherit', transition: 'border-color 0.15s',
-    boxSizing: 'border-box',
-  }
+  const inputCls = `form-input form-input--md${mismatch ? ' form-input--error' : ''}`
 
   return (
     <ToolLayout code="06 / PROTECT" title="Protect PDF"
@@ -69,42 +58,27 @@ export default function ProtectPage() {
         {!file ? (
           <DropZone accept=".pdf" onFiles={handleFiles} label="Drop a PDF file here" />
         ) : (
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--surface)' }}>
-            <div className="file-info-row" style={{ border: 'none', borderRadius: 0 }}>
-              <div className="file-info-row__body">
-                <p className="file-name">{file.name}</p>
-                <p className="mono file-size">{fmt(file.size)}</p>
-              </div>
-              <button onClick={reset} className="change-btn">change</button>
-            </div>
-          </div>
+          <SelectedFileCard file={file} onChange={reset} />
         )}
 
         {file && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="tool-stack tool-stack--tight">
             {/* Password */}
             <div>
               <p className="section-label">Password</p>
-              <div style={{ position: 'relative' }}>
+              <div className="password-input-wrap">
                 <input
                   type={showPwd ? 'text' : 'password'}
                   placeholder="Enter password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  style={inputStyle}
+                  className={inputCls}
                   autoComplete="new-password"
-                  onFocus={e => { if (!mismatch || !confirm.length) e.target.style.borderColor = 'var(--accent)' }}
-                  onBlur={e => { e.target.style.borderColor = mismatch && confirm.length > 0 ? '#fcc' : 'var(--border)' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPwd(v => !v)}
-                  style={{
-                    position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    color: 'var(--text-3)', fontSize: 11, fontFamily: 'inherit',
-                    padding: '2px 4px',
-                  }}
+                  className="password-toggle"
                 >
                   {showPwd ? 'hide' : 'show'}
                 </button>
@@ -116,17 +90,15 @@ export default function ProtectPage() {
             <div>
               <p className="section-label">
                 Confirm password
-                {mismatch && <span style={{ color: '#e03333', marginLeft: 8, fontWeight: 400 }}>— passwords don&apos;t match</span>}
+                {mismatch && <span className="password-mismatch">— passwords don&apos;t match</span>}
               </p>
               <input
                 type={showPwd ? 'text' : 'password'}
                 placeholder="Re-enter password"
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
-                style={inputStyle}
+                className={inputCls}
                 autoComplete="new-password"
-                onFocus={e => { if (!mismatch || !confirm.length) e.target.style.borderColor = 'var(--accent)' }}
-                onBlur={e => { e.target.style.borderColor = mismatch && confirm.length > 0 ? '#fcc' : 'var(--border)' }}
               />
             </div>
           </div>

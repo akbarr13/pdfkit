@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(rtk next:*)",
+      "Bash(npx next:*)",
+      "Bash(rtk git:*)",
+      "Bash(rtk npm:*)"
+    ]
+  }
+}

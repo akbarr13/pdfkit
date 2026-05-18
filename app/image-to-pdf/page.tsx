@@ -9,11 +9,7 @@ import { Err, Ok, ActionBtn } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { imagesToPdf } from '@/lib/imageToPdf'
 import { validateImages } from '@/lib/validate'
-
-function fmt(b: number) {
-  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB'
-  return (b / (1024 * 1024)).toFixed(2) + ' MB'
-}
+import { formatBytes } from '@/lib/format'
 
 export default function ImageToPdfPage() {
   const [files, setFiles]   = useState<File[]>([])
@@ -78,7 +74,7 @@ export default function ImageToPdfPage() {
 
         {status === 'error' && <Err msg={error} onRetry={canConvert ? handleConvert : undefined} />}
         {status === 'done' && result && (
-          <Ok msg={`images.pdf saved · ${result.pages} page${result.pages > 1 ? 's' : ''} · ${fmt(result.size)}`} onReset={reset} />
+          <Ok msg={`images.pdf saved · ${result.pages} page${result.pages > 1 ? 's' : ''} · ${formatBytes(result.size)}`} onReset={reset} />
         )}
 
         <ActionBtn onClick={handleConvert} disabled={!canConvert} loading={status === 'processing'} hint="⌘ Enter">

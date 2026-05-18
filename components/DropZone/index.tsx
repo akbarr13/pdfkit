@@ -79,9 +79,9 @@ export default function DropZone({ accept, multiple = false, onFiles, label }: D
   const overlay = mounted && pageDragging ? createPortal(
     <div className="page-drop-overlay">
       <div className="page-drop-overlay__inner">
-        <div style={{ fontSize: 40, marginBottom: 12, color: 'var(--accent)', animation: 'fadeUp 0.25s ease both' }}>↓</div>
-        <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>Drop to load</p>
-        <p className="mono" style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.06em' }}>{formatHint}</p>
+        <div className="page-drop-overlay__icon">↓</div>
+        <p className="page-drop-overlay__title">Drop to load</p>
+        <p className="mono page-drop-overlay__hint">{formatHint}</p>
       </div>
     </div>,
     document.body
@@ -92,45 +92,22 @@ export default function DropZone({ accept, multiple = false, onFiles, label }: D
       {overlay}
       <div
         onClick={() => inputRef.current?.click()}
-        onMouseDown={e => (e.currentTarget as HTMLDivElement).style.transform = 'scale(0.998)'}
-        onMouseUp={e => (e.currentTarget as HTMLDivElement).style.transform = 'scale(1)'}
-        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.transform = 'scale(1)'}
         onDragOver={e => { e.preventDefault(); setDragging(true) }}
         onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false) }}
         onDrop={handleDrop}
         role="button" tabIndex={0} aria-label="Upload files"
         onKeyDown={e => e.key === 'Enter' && inputRef.current?.click()}
-        style={{
-          border: `2px dashed ${dragging ? 'var(--accent)' : 'var(--border-2)'}`,
-          borderRadius: 'var(--radius)',
-          background: dragging ? 'rgba(255,68,0,0.03)' : 'var(--surface)',
-          padding: '40px 32px',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
-          cursor: 'pointer', userSelect: 'none', outline: 'none',
-          transition: 'border-color 0.15s, background 0.12s, transform 0.1s, box-shadow 0.15s',
-          transform: dragging ? 'scale(1.008)' : 'scale(1)',
-          boxShadow: dragging ? '0 0 0 4px rgba(255,68,0,0.07), 0 4px 20px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.04)',
-        }}
+        className={`dropzone${dragging ? ' is-dragging' : ''}`}
       >
-        <div style={{
-          width: 48, height: 48, borderRadius: 10,
-          border: `1.5px solid ${dragging ? 'var(--accent)' : 'var(--border-2)'}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 22, color: dragging ? 'var(--accent)' : 'var(--text-3)',
-          background: dragging ? 'rgba(255,68,0,0.06)' : 'var(--surface-2)',
-          transition: 'all 0.15s',
-          transform: dragging ? 'translateY(-3px)' : 'none',
-        }}>
+        <div className="dropzone__icon">
           {dragging ? '↓' : '+'}
         </div>
 
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: dragging ? 'var(--accent)' : 'var(--text)', marginBottom: 4, transition: 'color 0.15s' }}>
+        <div className="dropzone__text">
+          <p className="dropzone__title">
             {dragging ? 'Release to load' : (label ?? 'Drop files here or click to browse')}
           </p>
-          <p className="mono" style={{ fontSize: 10, color: 'var(--text-3)', letterSpacing: '0.06em' }}>
-            {formatHint}
-          </p>
+          <p className="mono dropzone__hint">{formatHint}</p>
         </div>
 
         <input ref={inputRef} type="file" accept={accept} multiple={multiple} style={{ display: 'none' }} onChange={handleChange} />

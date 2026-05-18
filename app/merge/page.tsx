@@ -62,9 +62,7 @@ export default function MergePage() {
         {files.length > 0 && <FileList files={files} onRemove={removeFile} onReorder={reorder} />}
 
         {files.length === 1 && status === 'idle' && (
-          <p className="mono" style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.04em' }}>
-            ↑ add at least one more PDF to merge
-          </p>
+          <p className="mono hint-line">↑ add at least one more PDF to merge</p>
         )}
 
         {status === 'processing' && <ProgressBar current={1} total={1} label="Merging" />}

@@ -4,15 +4,11 @@ import { useState, useCallback } from 'react'
 import { saveAs } from 'file-saver'
 import ToolLayout from '@/components/ToolLayout'
 import DropZone from '@/components/DropZone'
+import SelectedFileCard from '@/components/SelectedFileCard'
 import { Err, Ok, ActionBtn } from '@/components/ToolUI'
 import { useCmdEnter } from '@/lib/useHotkey'
 import { watermarkPdf } from '@/lib/watermarkPdf'
 import { validatePdf } from '@/lib/validate'
-
-function fmt(b: number) {
-  if (b < 1024 * 1024) return (b / 1024).toFixed(0) + ' KB'
-  return (b / (1024 * 1024)).toFixed(2) + ' MB'
-}
 
 export default function WatermarkPage() {
   const [file, setFile]       = useState<File | null>(null)
@@ -53,19 +49,11 @@ export default function WatermarkPage() {
         {!file ? (
           <DropZone accept=".pdf" onFiles={handleFiles} label="Drop a PDF file here" />
         ) : (
-          <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--surface)' }}>
-            <div className="file-info-row" style={{ border: 'none', borderRadius: 0 }}>
-              <div className="file-info-row__body">
-                <p className="file-name">{file.name}</p>
-                <p className="mono file-size">{fmt(file.size)}</p>
-              </div>
-              <button onClick={reset} className="change-btn">change</button>
-            </div>
-          </div>
+          <SelectedFileCard file={file} onChange={reset} />
         )}
 
         {file && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="tool-stack tool-stack--md">
             <div>
               <p className="section-label">Watermark text</p>
               <input
@@ -78,30 +66,30 @@ export default function WatermarkPage() {
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span className="section-label" style={{ marginBottom: 0 }}>Opacity</span>
-                <span className="mono" style={{ fontSize: 11, color: 'var(--accent)', fontWeight: 600 }}>{Math.round(opacity * 100)}%</span>
+              <div className="range-row">
+                <span className="section-label section-label--inline">Opacity</span>
+                <span className="mono range-value">{Math.round(opacity * 100)}%</span>
               </div>
               <input type="range" min={0.05} max={0.9} step={0.05} value={opacity}
                 onChange={e => setOpacity(Number(e.target.value))}
-                style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>subtle</span>
-                <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>visible</span>
+                className="range-input" />
+              <div className="mono range-axis">
+                <span>subtle</span>
+                <span>visible</span>
               </div>
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span className="section-label" style={{ marginBottom: 0 }}>Angle</span>
-                <span className="mono" style={{ fontSize: 11, color: 'var(--accent)', fontWeight: 600 }}>{angle}°</span>
+              <div className="range-row">
+                <span className="section-label section-label--inline">Angle</span>
+                <span className="mono range-value">{angle}°</span>
               </div>
               <input type="range" min={0} max={90} step={5} value={angle}
                 onChange={e => setAngle(Number(e.target.value))}
-                style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>horizontal</span>
-                <span className="mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>diagonal</span>
+                className="range-input" />
+              <div className="mono range-axis">
+                <span>horizontal</span>
+                <span>diagonal</span>
               </div>
             </div>
           </div>
